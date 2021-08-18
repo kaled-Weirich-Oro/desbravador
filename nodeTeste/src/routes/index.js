@@ -4,12 +4,12 @@ import {userToken} from '../providers/tokens';
 import {ValidaUsuario} from '../middlewares/validate';
 
 export const router = new Router();
-
+// Teste com ping
 router.get('/ping', ctx => {
     console.log('/ping');
     return ctx.body = {ping: "pong"}
 });
-
+// criação de tabela no schema public
 router.get('/schema', ctx => {
     return Connection.schema.withSchema('public').createTable('users', function (table) {
         table.increments();
@@ -17,17 +17,20 @@ router.get('/schema', ctx => {
        return ctx.body = "Criada a tabela users"
     });
 })
+// busca na tabela teste com o middlware que só é validado caso o JWT adquirido através do login
 router.get('/get', ValidaUsuario(), ctx  => {
     return Connection("teste").then((data) => {
        return ctx.body = {teste: data}
     });   
 });
+// busca na tabela teste através do id
 router.get('/get/:id', ctx => {
     let id = ctx.params.id;
     return Connection("teste").where("id", id).then((data) => {
         ctx.body = {teste: data[0]}
     });
 });
+// Inserção na tabela teste
 router.post("/post", ctx => {
     let json = ctx.request.body;
     return Connection("teste").insert(json).then((data) => {
@@ -36,6 +39,7 @@ router.post("/post", ctx => {
         ctx.body = {erro: e};
     });
 });
+// Atualização na tabela teste
 router.patch("/update/:id", ctx => {
     let id = ctx.params.id;
     let json = ctx.request.body;
@@ -45,6 +49,7 @@ router.patch("/update/:id", ctx => {
         ctx.body = {erro: e};
     });
 });
+// Deletar da tabela teste através do id
 router.delete("/delete/:id", ctx => {
     let id = ctx.params.id;
     return Connection('teste').delete().where("id", id).then((data) => {
@@ -53,6 +58,7 @@ router.delete("/delete/:id", ctx => {
         ctx.body = {erro: e};
     });
 });
+// Login
 router.post('/login', async ctx => {
     const {login, senha} = ctx.request.body;
     return Connection('login').select('login', 'senha').where({'login': login, 'senha': senha}).then((data) => {
@@ -64,6 +70,7 @@ router.post('/login', async ctx => {
         ctx.throw(500, e);
     })
 });
+// Exemplo de transaction
 router.post('/transaction', async ctx => {
     const json = ctx.request.body;
     return ctx.body = await transaction();
